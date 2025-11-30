@@ -1,5 +1,4 @@
 import pytest
-import sys
 
 # Store scores
 scores = {
@@ -9,6 +8,17 @@ scores = {
 }
 
 
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    Hook to attach markers to the report object so they can be accessed in the summary.
+    """
+    outcome = yield
+    report = outcome.get_result()
+    # Attach markers to the report
+    report.markers = [m.name for m in item.iter_markers()]
+
+
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """
     Custom hook to print the scorecard at the end of the test session.
@@ -16,11 +26,14 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     passed_tests = terminalreporter.stats.get('passed', [])
 
     for test in passed_tests:
-        if "easy" in test.nodeid:
+        # Check markers attached in pytest_runtest_makereport
+        markers = getattr(test, 'markers', [])
+
+        if "easy" in markers:
             scores["easy"]["count"] += 1
-        elif "medium" in test.nodeid:
+        elif "medium" in markers:
             scores["medium"]["count"] += 1
-        elif "hard" in test.nodeid:
+        elif "hard" in markers:
             scores["hard"]["count"] += 1
 
     total_score = (scores["easy"]["count"] * scores["easy"]["points"]) + \
