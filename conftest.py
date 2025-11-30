@@ -2,10 +2,20 @@ import pytest
 
 # Store scores
 scores = {
-    "easy": {"count": 0, "total": 4, "points": 2},
-    "medium": {"count": 0, "total": 4, "points": 3},
-    "hard": {"count": 0, "total": 4, "points": 5}
+    "easy": {"count": 0, "total": 0, "points": 2},
+    "medium": {"count": 0, "total": 0, "points": 3},
+    "hard": {"count": 0, "total": 0, "points": 5}
 }
+
+
+def pytest_collection_modifyitems(items):
+    """
+    Hook to count the total number of tests for each marker dynamically.
+    """
+    for item in items:
+        for marker in item.iter_markers():
+            if marker.name in scores:
+                scores[marker.name]["total"] += 1
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -40,7 +50,9 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
                   (scores["medium"]["count"] * scores["medium"]["points"]) + \
                   (scores["hard"]["count"] * scores["hard"]["points"])
 
-    max_score = (4 * 2) + (4 * 3) + (4 * 5)  # 40
+    max_score = (scores["easy"]["total"] * scores["easy"]["points"]) + \
+                (scores["medium"]["total"] * scores["medium"]["points"]) + \
+                (scores["hard"]["total"] * scores["hard"]["points"])
 
     terminalreporter.section("Lab 5 Score Summary")
     terminalreporter.write_line(
