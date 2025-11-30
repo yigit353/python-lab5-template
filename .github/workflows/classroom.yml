@@ -1,0 +1,174 @@
+name: Autograding Tests
+
+on:
+  - push
+  - workflow_dispatch
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+
+    # --- EASY TASKS (2 Points Each) ---
+
+    - name: Task 1 - List All Items
+      id: task-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 1 - List All Items
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_1_list_all -v
+        timeout: 10
+        max-score: 2
+
+    - name: Task 2 - Find Items by Condition
+      id: task-2
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 2 - Find Items by Condition
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_2_condition -v
+        timeout: 10
+        max-score: 2
+
+    - name: Task 3 - Count Items
+      id: task-3
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 3 - Count Items
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_3_count -v
+        timeout: 10
+        max-score: 2
+
+    - name: Task 4 - Get Specific Attribute
+      id: task-4
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 4 - Get Specific Attribute
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_4_attribute -v
+        timeout: 10
+        max-score: 2
+
+    # --- MEDIUM TASKS (3 Points Each) ---
+
+    - name: Task 5 - Update Quantity
+      id: task-5
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 5 - Update Quantity
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_5_update -v
+        timeout: 10
+        max-score: 3
+
+    - name: Task 6 - Add New Item
+      id: task-6
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 6 - Add New Item
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_6_insert -v
+        timeout: 10
+        max-score: 3
+
+    - name: Task 7 - Delete Item
+      id: task-7
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 7 - Delete Item
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_7_delete -v
+        timeout: 10
+        max-score: 3
+
+    - name: Task 8 - Calculate Average
+      id: task-8
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 8 - Calculate Average
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_8_avg -v
+        timeout: 10
+        max-score: 3
+
+    # --- HARD TASKS (5 Points Each) ---
+
+    - name: Task 9 - Create Schema
+      id: task-9
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 9 - Create Schema
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_9_create_schema -v
+        timeout: 10
+        max-score: 5
+
+    - name: Task 10 - Bulk Insert
+      id: task-10
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 10 - Bulk Insert
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_10_bulk_insert -v
+        timeout: 10
+        max-score: 5
+
+    - name: Task 11 - Transaction Transfer
+      id: task-11
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 11 - Transaction Transfer
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_11_transaction_transfer -v
+        timeout: 10
+        max-score: 5
+
+    - name: Task 12 - Transaction Undo
+      id: task-12
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Task 12 - Transaction Undo
+        setup-command: ''
+        command: python -m pytest test_lab5.py::test_task_12_undo -v
+        timeout: 10
+        max-score: 5
+
+    # --- REPORTING ---
+
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TASK-1_RESULTS: "${{steps.task-1.outputs.result}}"
+        TASK-2_RESULTS: "${{steps.task-2.outputs.result}}"
+        TASK-3_RESULTS: "${{steps.task-3.outputs.result}}"
+        TASK-4_RESULTS: "${{steps.task-4.outputs.result}}"
+        TASK-5_RESULTS: "${{steps.task-5.outputs.result}}"
+        TASK-6_RESULTS: "${{steps.task-6.outputs.result}}"
+        TASK-7_RESULTS: "${{steps.task-7.outputs.result}}"
+        TASK-8_RESULTS: "${{steps.task-8.outputs.result}}"
+        TASK-9_RESULTS: "${{steps.task-9.outputs.result}}"
+        TASK-10_RESULTS: "${{steps.task-10.outputs.result}}"
+        TASK-11_RESULTS: "${{steps.task-11.outputs.result}}"
+        TASK-12_RESULTS: "${{steps.task-12.outputs.result}}"
+      with:
+        runners: task-1,task-2,task-3,task-4,task-5,task-6,task-7,task-8,task-9,task-10,task-11,task-12
