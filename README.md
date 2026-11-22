@@ -30,16 +30,22 @@ How to Run Tests & Check Score
 
 We use `pytest` to grade the lab. The testing script will automatically generate the database files required for the lab.
 
-1.  Open your terminal.
+1.  Open your terminal in the lab folder. If needed, install the dependencies:
+
+    ```bash
+    python -m pip install -r requirements.txt
+    ```
 
 2.  Run the following command:
 
     ```bash
-    pytest -v -s
-
+    python test_lab5.py
     ```
 
-    *(The `-v` shows details, `-s` allows printed output to be seen)*
+    You can also open `test_lab5.py` in VS Code and select **Run Python File**.
+    Both methods run all 12 tests and print the score summary.
+
+    To run pytest directly, use `python -m pytest test_lab5.py -v -s`.
 
 3.  At the end of the test run, you will see a **Score Summary** calculated out of 40 points.
 
@@ -67,7 +73,7 @@ Submission
 
 1.  Complete the functions in `lab5_exercises.py`.
 
-2.  Ensure `pytest` shows 40/40.
+2.  Ensure the test run shows 40/40.
 
 3.  Commit and Push to GitHub Classroom:
 
