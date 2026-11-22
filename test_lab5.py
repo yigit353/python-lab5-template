@@ -257,3 +257,11 @@ def test_task_12_undo(populated_finance_db):
     conn.close()
 
     assert row is not None, "Alice should still exist after rollback"
+
+
+if __name__ == "__main__":
+    import sys
+
+    test_file = os.path.abspath(__file__)
+    os.chdir(os.path.dirname(test_file))
+    raise SystemExit(pytest.main([test_file, "-v", "-s", *sys.argv[1:]]))
