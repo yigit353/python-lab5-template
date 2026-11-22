@@ -6,11 +6,12 @@ import lab5_exercises as lab
 
 # --- SETUP: GENERATE MYSTERY DB ---
 # This runs before any tests to ensure the student has the DB to work with.
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def setup_mystery_db():
     db_name = lab.EXISTING_DB_NAME
-    if os.path.exists(db_name):
-        os.remove(db_name)
+    for path in (db_name, lab.NEW_DB_NAME):
+        if os.path.exists(path):
+            os.remove(path)
 
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -45,6 +46,28 @@ def setup_mystery_db():
         os.remove(db_name)
     if os.path.exists(lab.NEW_DB_NAME):
         os.remove(lab.NEW_DB_NAME)
+
+
+@pytest.fixture
+def empty_finance_db(setup_mystery_db):
+    db_name = lab.NEW_DB_NAME
+    conn = sqlite3.connect(db_name)
+    conn.execute('CREATE TABLE accounts (id INTEGER PRIMARY KEY, owner TEXT, balance REAL)')
+    conn.commit()
+    conn.close()
+    return db_name
+
+
+@pytest.fixture
+def populated_finance_db(empty_finance_db):
+    conn = sqlite3.connect(empty_finance_db)
+    conn.executemany(
+        'INSERT INTO accounts (owner, balance) VALUES (?, ?)',
+        [('Alice', 1000.0), ('Bob', 500.0), ('Charlie', 200.0)]
+    )
+    conn.commit()
+    conn.close()
+    return empty_finance_db
 
 
 # --- HELPER ---
@@ -142,14 +165,11 @@ def test_task_7_delete(setup_mystery_db):
 @pytest.mark.medium
 def test_task_8_avg(setup_mystery_db):
     check_func('task_8_calculate_average')
-    # Current DB state:
-    # Gatsby (1925), Mockingbird (1960), P&P (1813), Catcher (1951), Dune (1965)
-    # Sum: 7714. Count: 5. Avg: 1542.8
-    # Note: 1984 was deleted in previous test
+    # Each test starts with the original five books: sum 9598, average 1919.6.
 
     avg = lab.task_8_calculate_average(setup_mystery_db)
     # Allow small float error
-    assert 1540 < avg < 1545
+    assert avg == pytest.approx(1919.6)
 
 
 # --- HARD TESTS (5 PTS) ---
@@ -180,9 +200,9 @@ def test_task_9_create_schema():
 
 
 @pytest.mark.hard
-def test_task_10_bulk_insert():
+def test_task_10_bulk_insert(empty_finance_db):
     check_func('task_10_bulk_insert')
-    db_name = lab.NEW_DB_NAME
+    db_name = empty_finance_db
     data = [('Alice', 1000.0), ('Bob', 500.0), ('Charlie', 200.0)]
     lab.task_10_bulk_insert(db_name, data)
 
@@ -195,9 +215,9 @@ def test_task_10_bulk_insert():
 
 
 @pytest.mark.hard
-def test_task_11_transaction_transfer():
+def test_task_11_transaction_transfer(populated_finance_db):
     check_func('task_11_transaction_transfer')
-    db_name = lab.NEW_DB_NAME
+    db_name = populated_finance_db
     # Assume IDs: Alice=1 (1000), Bob=2 (500)
 
     # 1. Valid Transfer
@@ -221,9 +241,9 @@ def test_task_11_transaction_transfer():
 
 
 @pytest.mark.hard
-def test_task_12_undo():
+def test_task_12_undo(populated_finance_db):
     check_func('task_12_transaction_undo')
-    db_name = lab.NEW_DB_NAME
+    db_name = populated_finance_db
     # Try to delete Alice (id=1), but rollback
 
     exists_after_rollback = lab.task_12_transaction_undo(db_name, 1)
