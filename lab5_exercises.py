@@ -259,3 +259,15 @@ If you do not use the exact function names, the tests will fail.
 # Output: True
 
 # [WRITE YOUR CODE HERE]
+
+
+# ==========================================
+# TEST YOUR SOLUTION
+# ==========================================
+# From this lab's folder, run:
+#   python -m pip install -r requirements.txt  # Once, if needed
+#   python test_lab5.py
+# In VS Code, open test_lab5.py and choose Run Python File.
+# The test run prints all 12 results and your score out of 40.
+# Optional pytest command:
+#   python -m pytest test_lab5.py -v -s
